@@ -21,6 +21,7 @@ services:
         - mongodb_initdb_database=${MONGO_INITDB_DATABASE}
     volumes:
       - mongo_data:/data/db
+      -
     env_file:
       - .env
     ports:

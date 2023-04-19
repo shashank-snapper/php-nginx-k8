@@ -84,9 +84,9 @@ spec:
             - containerPort: 80
           env:
             - name: MONGODB_URL
-              value: mongodb://admin:password@database-service:27017/test_database
+              value: mongodb://snapper:snapper@database-service:27017/snapper
             - name: MONGODB_DB
-              value: test_database
+              value: snapper
           volumeMounts:
             - name: config-volume
               mountPath: /srv/.env.local

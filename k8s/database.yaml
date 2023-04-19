@@ -1,89 +1,80 @@
+---
+
 apiVersion: v1
 kind: Service
 metadata:
   name: database-service
 spec:
   selector:
-     app: database
+    app: database
   ports:
-  - port: 27017
-    targetPort: 27017
-    nodePort: 30081
+    - name: database
+      port: 27017
+      targetPort: 27017
+      protocol: TCP
+      nodePort: 30081
   type: NodePort
-#  type: ClusterIP
+#  clusterIP: None
 
 ---
 
-#apiVersion: v1
-#kind: ConfigMap
-#metadata:
-#  name: mongodb-config
-#data:
-#  # MongoDB server configuration
-#  mongodb.conf: |
-#    storage:
-#      dbPath: /data/db
-#    net:
-#      bindIp: 0.0.0.0
-#      port: 27017
-#  # MongoDB user credentials
-#  mongodb-credentials.yml: |
-#    users:
-#    - name: admin
-#      db: test_database
-#      password: password
-#      roles:
-#      - readWrite
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: database-configmap
+data:
+  mongodb-config: |-
+    rs.initiate({
+      _id: "rs0",
+      members: [
+        { _id: 0, host: "database-0.database-service" },
+        { _id: 1, host: "database-1.database-service" },
+        { _id: 2, host: "database-2.database-service" }
+      ]
+    })
 
 ---
+
 
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: database
 spec:
+  serviceName: database
+  replicas: 1
   selector:
     matchLabels:
       app: database
-  replicas: 1
   template:
     metadata:
       labels:
         app: database
     spec:
-#      volumes:
-#        # Mount the MongoDB data directory
-#        - name: mongodb-data
-#          persistentVolumeClaim:
-#            claimName: mongodb-pvc
-#        # Mount the MongoDB configuration as a file
-#        - name: mongodb-config
-#          configMap:
-#            name: mongodb-config
-#            items:
-#              - key: mongodb.conf
-#                path: mongodb.conf
-        # Mount the MongoDB user credentials as a file
-#        - name: mongodb-credentials
-#          configMap:
-#            name: mongodb-config
-#            items:
-#              - key: mongodb-credentials.yml
-#                path: mongodb-credentials.yml
       containers:
-        - name: database
+        - name: mongodb
           image: mongo:5
-          ports:
-            - containerPort: 27017
           env:
             - name: MONGO_INITDB_ROOT_USERNAME
               value: root
             - name: MONGO_INITDB_ROOT_PASSWORD
               value: password
-              #The following credentials will create a new user in mongodb for the mentioned db
-            - name: MONGO_USERNAME
-              value: admin
-            - name: MONGO_PASSWORD
-              value: password
-            - name: MONGO_DBNAME
-              value: test_database
+          ports:
+            - name: mongodb
+              containerPort: 27017
+          volumeMounts:
+            - name: mongodb-data
+              mountPath: /data/db
+            - name: shared-config
+              mountPath: /shared-config
+#          command: [ "mongod" ]
+#          args: [ "--replSet", "rs0" ]
+      volumes:
+        - name: mongodb-data
+          persistentVolumeClaim:
+            claimName: database-pvc
+        - name: shared-config
+          configMap:
+            name: database-configmap
+---
+
