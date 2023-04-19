@@ -12,6 +12,19 @@ services:
 #      - app_log:/srv/var/log
     ports:
       - "80:80"
+  mongodb:
+    build:
+      context: ./docker/mongodb
+      args:
+        - mongodb_username=${MONGODB_USERNAME}
+        - mongodb_password=${MONGODB_PASSWORD}
+        - mongodb_initdb_database=${MONGO_INITDB_DATABASE}
+    volumes:
+      - mongo_data:/data/db
+    env_file:
+      - .env
+    ports:
+      - "27017:27017"
 
 volumes:
   app_log:
