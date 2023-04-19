@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  app:
+    build:
+        context: .
+    volumes:
+      - ./application:/srv:rw,cached
+      - ./docker/php/.ssh:/var/www/.ssh
+      - ./docker/php/.composer:/var/www/.composer
+#      - ./docker/php/www:/var/www/
+#      - app_log:/srv/var/log
+    ports:
+      - "80:80"
+
+volumes:
+  app_log:
+  nginx_log:
+  mongo_data:
