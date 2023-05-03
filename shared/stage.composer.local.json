@@ -1,0 +1,56 @@
+{
+  "require": {
+    "zimble/apparel21": "dev-develop",
+    "zimble/bigcommerce": "dev-develop",
+    "zimble/core": "dev-develop",
+    "zimble/shopify": "dev-develop",
+    "zimble/magento1": "dev-develop",
+    "zimble/sapb1": "dev-develop",
+    "zimble/magentaretail": "dev-develop",
+    "zimble/retailexpress": "dev-develop",
+    "zimble/lightspeed": "dev-develop",
+    "zimble/salesforce-commerce-cloud": "dev-develop"
+  },
+  "repositories": [
+    {
+      "type": "git",
+      "url": "git@github.com:ZimbleaConnect/Core.git"
+    },
+    {
+      "type": "git",
+      "url": "git@github.com:ZimbleaConnect/Apparel21.git"
+    },
+    {
+      "type": "git",
+      "url": "git@github.com:ZimbleaConnect/BigCommerce.git"
+    },
+    {
+      "type": "git",
+      "url": "git@github.com:ZimbleaConnect/Shopify.git"
+    },
+    {
+      "type": "git",
+      "url": "git@github.com:ZimbleaConnect/Magento1.git"
+    },
+    {
+      "type": "git",
+      "url": "git@github.com:ZimbleaConnect/SAPB1.git"
+    },
+    {
+      "type": "git",
+      "url": "git@github.com:ZimbleaConnect/MagentaRetail.git"
+    },
+    {
+      "type": "git",
+      "url": "git@github.com:ZimbleaConnect/RetailExpress.git"
+    },
+    {
+      "type": "git",
+      "url": "git@github.com:ZimbleaConnect/Lightspeed.git"
+    },
+    {
+      "type": "git",
+      "url": "git@github.com:ZimbleaConnect/SFCC.git"
+    }
+  ]
+}

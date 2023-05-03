@@ -1,0 +1,4 @@
+application/
+.idea
+.vscode
+shared/ssh-github

@@ -1,0 +1,5 @@
+version: "1.0.1"
+image: shashanknsdocker/php-nginx
+git:
+  url: git@github.com:ZimbleaConnect/docker.git
+  defaultBranch: 'feature/k8s'
