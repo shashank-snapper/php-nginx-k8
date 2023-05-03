@@ -1,4 +1,6 @@
-application/
+/application
 .idea
 .vscode
-shared/ssh-github
+shared/ssh-github/*
+# Ignore files or directories that start with a number
+/[0-9]*/

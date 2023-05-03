@@ -18,9 +18,9 @@ touch "$LOCK_FILE"
 
 # Define a function to remove the cloned directory
 cleanup() {
-  if [ -d "$NEW_VERSION" ]; then
-    rm -rf "$NEW_VERSION"
-  fi
+  #  if [ -d "$NEW_VERSION" ]; then
+  #    rm -rf "$NEW_VERSION"
+  #  fi
   if [ -f "$LOCK_FILE" ]; then
     rm "$LOCK_FILE"
   fi
@@ -82,12 +82,16 @@ echo "GIT Branch: $GIT_BRANCH"
 # Clone the git to current repository
 # ---------------------------------------------------------------
 
-#if ! git clone -b "$GIT_BRANCH" "$GIT_REPO" "$NEW_VERSION"; then
-#  echo "Error: Failed to clone Git repository" >>error.log 2>&1
-#  exit 1
-#else
-#  echo "Cloned successfully"
-#fi
+if ! git clone -b "$GIT_BRANCH" "$GIT_REPO" "$NEW_VERSION"; then
+  echo "Error: Failed to clone Git repository." >>error.log 2>&1
+  if [ -d "$NEW_VERSION" ]; then
+    echo "Folder already exists." >>error.log 2>&1
+  else
+    exit 1
+  fi
+else
+  echo "Cloned successfully"
+fi
 
 # Copy dependencies to the application
 # ---------------------------------------------------------------

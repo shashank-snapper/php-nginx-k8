@@ -1,8 +1,23 @@
-### K8s Symfony Deployer
+## K8s Symfony Deployer
 
 <hr>
 
-#### Install Dependencies:
+### Kubernetes Default Commands
+
+1. Change the default namespace
+   ```
+   kubectl config set-context --current --namespace=<namespace>
+   ```
+2. Create ImagePullSecret  "regcred"
+   ``` 
+   kubectl create secret generic regcred \
+   --from-file=.dockerconfigjson=<path/to/.docker/config.json> \
+   --type=kubernetes.io/dockerconfigjson
+   ```
+
+<hr>
+
+### Install Dependencies:
 
 1. semver
     ```
@@ -22,7 +37,7 @@
 
 <hr>
 
-## Setting up a Mongodb Replica Set
+### Setting up a Mongodb Replica Set
 
 1. Apply all the files in the directory
     ```
