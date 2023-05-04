@@ -1,0 +1,122 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mercure-service
+spec:
+  selector:
+    app: mercure
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 80
+  type: LoadBalancer
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mercure-config
+data:
+  publisher-jwt-key: "AOriWgBjMqgTvEGDW5pab4qlwByTvucnZ01"
+  publisher-jwt-alg: "HS256"
+  subscriber-jwt-key: "AOriWgBjMqgTvEGDW5pab4qlwByTvucnZ01"
+  subscriber-jwt-alg: "HS256"
+  transport-url: "bolt:///data/mercure.db"
+  extra-directives: |
+    cors_origins *
+    anonymous
+    auto_https off
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mercure
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mercure
+  template:
+    metadata:
+      labels:
+        app: mercure
+    spec:
+      containers:
+        - name: mercure
+          image: dunglas/mercure
+          env:
+            - name: SERVER_NAME
+              value: :80
+            - name: MERCURE_PUBLISHER_JWT_KEY
+              valueFrom:
+                configMapKeyRef:
+                  name: mercure-config
+                  key: publisher-jwt-key
+            - name: MERCURE_PUBLISHER_JWT_ALG
+              valueFrom:
+                configMapKeyRef:
+                  name: mercure-config
+                  key: publisher-jwt-alg
+            - name: MERCURE_SUBSCRIBER_JWT_KEY
+              valueFrom:
+                configMapKeyRef:
+                  name: mercure-config
+                  key: subscriber-jwt-key
+            - name: MERCURE_SUBSCRIBER_JWT_ALG
+              valueFrom:
+                configMapKeyRef:
+                  name: mercure-config
+                  key: subscriber-jwt-alg
+          #            - name: GLOBAL_OPTIONS
+          #              valueFrom:
+          #                configMapKeyRef:
+          #                  name: mercure-config
+          #                  key: global-options
+          #            - name: MERCURE_EXTRA_DIRECTIVES
+          #              valueFrom:
+          #                configMapKeyRef:
+          #                  name: mercure-config
+          #                  key: extra-directives
+          #            - name: EXTRA_DIRECTIVES
+          #              valueFrom:
+          #                configMapKeyRef:
+          #                  name: mercure-config
+          #                  key: caddy-extra-directives
+          #            - name: MERCURE_TRANSPORT_URL
+          #              valueFrom:
+          #                configMapKeyRef:
+          #                  name: mercure-config
+          #                  key: transport-url
+          #            - name: MERCURE_LICENSE
+          #              valueFrom:
+          #                configMapKeyRef:
+          #                  name: mercure-config
+          #                  key: license
+          volumeMounts:
+            - mountPath: /data
+              name: mercure-data
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+          lifecycle:
+            preStop:
+              exec:
+                command: [ "curl", "-XPOST", "http://localhost:2019/stop" ]
+      volumes:
+        - name: mercure-data
+          persistentVolumeClaim:
+            claimName: mercure-data
+---

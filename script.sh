@@ -139,10 +139,10 @@ fi
 
 cd ../
 # Update the version number in the YAML file
-if ! yq e -i '.version = "'$(echo $NEW_VERSION)'"' version.yaml; then
-  echo "Error: Failed to update version number in version.yaml"
-  exit 1
-fi
+#if ! yq e -i '.version = "'$(echo $NEW_VERSION)'"' version.yaml; then
+#  echo "Error: Failed to update version number in version.yaml"
+#  exit 1
+#fi
 
 if [ -f error.log ]; then
   rm error.log

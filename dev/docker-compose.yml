@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  app:
+    build:
+      context: .
+      args:
+        - timezone=${AU}
+    command:
+      - "queue"
+    depends_on:
+      - mongodb
+      - redis
+  redis:
+    image: "redis:alpine"
+  mongodb:
+    image: mongo:5
+    env_file:
+      - .env
