@@ -48,6 +48,13 @@ spec:
             - name: redis-config-volume
               mountPath: /usr/local/etc/redis/redis.conf
               subPath: redis.conf
+          resources:
+            requests:
+              memory: "2Gi"
+              cpu: "2"
+            limits:
+              memory: "4Gi"
+              cpu: "4"
       volumes:
         - name: redis-data
           persistentVolumeClaim:

@@ -1,0 +1,111 @@
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  nginx.conf: |
+    user www-data;
+    worker_processes auto;
+    pid /run/nginx.pid;
+    
+    events {
+        worker_connections 1024;
+        multi_accept on;
+        use epoll;
+    }
+    
+    http {
+      sendfile on;
+      tcp_nopush on;
+      tcp_nodelay on;
+      server_tokens off;
+      log_not_found off;
+      types_hash_max_size 2048;
+    
+      include /etc/nginx/mime.types;
+      default_type application/octet-stream;
+    
+      access_log /var/log/nginx/access.log;
+      error_log /var/log/nginx/error.log;
+    
+    # Global configuration for all sites
+    server {
+      listen 80 default_server;
+      listen [::]:80 default_server;
+      server_name _;
+      root /srv/public;
+    # Add your location block here
+    location / {
+        try_files $uri /index.php$is_args$args;
+    }
+    
+    location ~ ^/index\.php(/|$) {
+      fastcgi_pass 127.0.0.1:9000;
+      fastcgi_split_path_info ^(.+\.php)(/.*)$;
+      include fastcgi_params;
+      proxy_buffer_size          512k;
+      proxy_buffers              16 256k;
+      proxy_busy_buffers_size    512k;
+      fastcgi_buffers 16 16k;
+      fastcgi_buffer_size 32k;
+      fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+      fastcgi_param DOCUMENT_ROOT $document_root;
+      internal;
+    }
+    }
+    }
+
+
+  .env: |
+    ###> symfony/framework-bundle ###
+    APP_ENV=prod
+    APP_SECRET=6dfbd17db900f9fc0cac77ed039241ed
+    ###< symfony/framework-bundle ###
+    
+    ###> doctrine/doctrine-bundle ###
+    DATABASE_URL="postgresql://db_user:db_password@127.0.0.1:5432/db_name?serverVersion=13&charset=utf8"
+    ###< doctrine/doctrine-bundle ###
+    
+    ###> nelmio/cors-bundle ###
+    CORS_ALLOW_ORIGIN='^https?://(localhost|127\.0\.0\.1)(:[0-9]+)?$'
+    ###< nelmio/cors-bundle ###
+    
+    ###> google/recaptcha ###
+    GOOGLE_RECAPTCHA_SITE_KEY=
+    GOOGLE_RECAPTCHA_SECRET=
+    READ_PREFERENCE_TAGS_TYPE=
+    ###< google/recaptcha ###
+    
+    ###> symfony/swiftmailer-bundle ###
+    MAILER_URL=null://localhost
+    ###< symfony/swiftmailer-bundle ###
+    
+    ###> google/apiclient ###
+    GOOGLE_API_KEY=
+    GOOGLE_CLIENT_ID=
+    GOOGLE_CLIENT_SECRET=
+    ###< google/apiclient ###
+    
+    redis_url=redis://redis-service
+    
+    OAUTH2_PRIVATE_KEY=/srv/keys/private.key
+    OAUTH2_PUBLIC_KEY=/srv/keys/public.key
+    OAUTH2_ENCRYPTION_KEY=
+    
+    # The below details will be overridden by the environment variables.
+    MONGODB_URL=mongodb://username:password@localhost:27017 
+    MONGODB_DB=database
+    
+    ###> symfony/mercure-bundle ###
+    # See https://symfony.com/doc/current/mercure.html#configuration
+    # The URL of the Mercure hub, used by the app to publish updates (can be a local URL)
+    MERCURE_URL=https://example.com/.well-known/mercure
+    # The public URL of the Mercure hub, used by the browser to connect
+    MERCURE_PUBLIC_URL=https://example.com/.well-known/mercure
+    # The secret used to sign the JWTs
+    MERCURE_JWT_SECRET="!ChangeMe!"
+    ###< symfony/mercure-bundle ###
+
+---
